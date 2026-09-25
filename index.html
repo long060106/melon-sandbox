@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>Melon Sandbox — JoJo Mode</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="jojo">
+  <canvas id="game"></canvas>
+
+  <header id="topbar">
+    <div class="brand"><span class="melon"></span><span>MELON SANDBOX</span></div>
+    <button id="jojoToggle" class="jojo-toggle" title="Toggle JoJo mode">JOJO MODE <b>ON</b></button>
+    <div class="spacer"></div>
+    <button class="tb" data-act="pause" title="Pause (Space when not controlling)">⏸</button>
+    <button class="tb" data-act="slow" title="Slow motion (Z)">🐢</button>
+    <button class="tb" data-act="clear" title="Clear everything">🗑</button>
+    <button class="tb" data-act="settings" title="JoJo settings">⚙</button>
+    <button class="tb" data-act="sound" title="Sound">🔊</button>
+    <button class="tb" data-act="help" title="Help (H)">?</button>
+    <button class="tb only-mobile" data-act="catalog" title="Spawn menu">＋</button>
+  </header>
+
+  <nav id="tools">
+    <button data-tool="drag" class="active" title="Drag &amp; throw (1)"><span>✋</span>Drag</button>
+    <button data-tool="control" title="Take control of a character (2)"><span>🎮</span>Control</button>
+    <button data-tool="delete" title="Delete (3)"><span>✖</span>Delete</button>
+    <button data-tool="pin" title="Pin / unpin a point (4)"><span>📌</span>Pin</button>
+    <button data-tool="explode" title="Explosion (5)"><span>💥</span>Boom</button>
+    <button data-tool="heal" title="Heal &amp; restore (6)"><span>✚</span>Heal</button>
+  </nav>
+
+  <aside id="catalog"></aside>
+
+  <div id="settings" class="panel" hidden>
+    <h3>JoJo Settings</h3>
+    <label><input type="checkbox" data-opt="ai" checked /> Stand AI (users fight each other)</label>
+    <label><input type="checkbox" data-opt="civilians" /> Stands attack civilians too</label>
+    <label><input type="checkbox" data-opt="menacing" checked /> Menacing ゴゴゴ</label>
+    <label><input type="checkbox" data-opt="tbc" checked /> "To Be Continued" on Stand user death</label>
+    <label><input type="checkbox" data-opt="voice" /> Voice callouts (text-to-speech)</label>
+    <label><input type="checkbox" data-opt="gore" checked /> Red juice (off = green)</label>
+  </div>
+
+  <div id="hud" hidden>
+    <div class="hud-top">
+      <div>
+        <div id="hudName">—</div>
+        <div id="hudStand"></div>
+      </div>
+      <button id="hudRelease" title="Release control (Esc)">✕</button>
+    </div>
+    <div class="hpbar"><div id="hudHp"></div></div>
+    <div id="pad">
+      <div class="move">
+        <button data-key="left">◀</button>
+        <button data-key="jump">▲</button>
+        <button data-key="right">▶</button>
+      </div>
+      <div class="acts">
+        <button data-act-key="J"><b>J</b><span></span><i></i></button>
+        <button data-act-key="K"><b>K</b><span></span><i></i></button>
+        <button data-act-key="L"><b>L</b><span></span><i></i></button>
+        <button data-act-key="P"><b>P</b><span>Pose</span><i></i></button>
+      </div>
+    </div>
+  </div>
+
+  <div id="help" class="modal" hidden>
+    <div class="modal-box">
+      <h2>How to play</h2>
+      <div class="cols">
+        <div>
+          <h4>Sandbox</h4>
+          <ul>
+            <li>Pick something in the <b>spawn menu</b>, then click the world to place it. Right-click or <kbd>Esc</kbd> stops placing.</li>
+            <li><b>Drag</b>: grab and throw anything. Double-click a person to control them.</li>
+            <li><b>Control</b>: click a person to take control.</li>
+            <li><b>Delete / Pin / Boom / Heal</b> do what they say. Keys <kbd>1</kbd>–<kbd>6</kbd> switch tools.</li>
+            <li><kbd>Space</kbd> pause (when not controlling) · <kbd>Z</kbd> slow-mo · <kbd>H</kbd> help</li>
+          </ul>
+        </div>
+        <div>
+          <h4>Controlling a character</h4>
+          <ul>
+            <li><kbd>A</kbd>/<kbd>D</kbd> or arrows: walk · <kbd>W</kbd>/<kbd>Space</kbd>: jump</li>
+            <li><kbd>J</kbd> <kbd>K</kbd> <kbd>L</kbd>: Stand abilities (shown on the action pad)</li>
+            <li><kbd>P</kbd>: strike a JoJo pose · <kbd>Esc</kbd>: let go</li>
+          </ul>
+          <h4>JoJo tips</h4>
+          <ul>
+            <li>Hits landed in stopped time are stored and <b>all land at once</b> when time resumes.</li>
+            <li>26 Stands from Parts 3–8. Each one's <kbd>J</kbd> <kbd>K</kbd> <kbd>L</kbd> abilities are named on the action pad.</li>
+            <li>The World: press <kbd>K</kbd> again during your time stop to drop a <b>Road Roller</b>.</li>
+            <li>Killer Queen: <kbd>K</kbd> turns what you touch into a bomb. Press <kbd>K</kbd> again to detonate it.</li>
+            <li>Crazy Diamond: <kbd>K</kbd> puts nearby people back together, even the dead and the erased.</li>
+            <li>Made in Heaven speeds up time for everyone, and its user most of all. Gold Experience Requiem sends attackers back to zero.</li>
+            <li>Throw the <b>Stand Arrow</b> at a civilian to awaken a random Stand.</li>
+          </ul>
+        </div>
+      </div>
+      <button class="close" data-act="help">Got it</button>
+    </div>
+  </div>
+
+  <div id="toast"></div>
+
+  <script src="js/audio.js"></script>
+  <script src="js/engine.js"></script>
+  <script src="js/effects.js"></script>
+  <script src="js/jojo.js"></script>
+  <script src="js/art.js"></script>
+  <script src="js/standart.js"></script>
+  <script src="js/projectiles.js"></script>
+  <script src="js/entities.js"></script>
+  <script src="js/stands.js"></script>
+  <script src="js/standdefs.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
