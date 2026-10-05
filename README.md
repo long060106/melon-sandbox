@@ -80,11 +80,20 @@ original interpretations built from each character's colors and silhouette, not 
 Heads, torsos, limbs and Stand bodies are rendered once into cached sprites
 (`sprite()` in `js/art.js`) and then rotated into place, which keeps 20+ fighters at 60 fps.
 
+## Jewish Community
+Twelve original characters (Ashkenazi, Sephardic, Mizrahi and Beta Israel / Ethiopian) in the
+spawn menu under **Jewish Community**, plus **Gather the community** to place all twelve at once.
+They are ordinary ragdolls without Stands. Kippot, tzitzit, a tallit, a shtreimel, tichel, a Bukharian
+chapan, Yemenite sidelocks, Ethiopian shamma and Magen David jewelry are all drawn in code. See
+[JEWISH-COMMUNITY.md](JEWISH-COMMUNITY.md) for each character, every asset, and the cultural notes.
+
 ## Code map
 | File | What |
 |---|---|
 | `js/engine.js` | Verlet physics: particles, constraints, collisions, time stop / acceleration bookkeeping |
 | `js/art.js` | Anime character art: designs, hair styles, faces, cel-shaded limbs, sprite cache |
+| `js/judaica.js` | Art for the Jewish community: Magen David, kippot, hats, tallit, tzitzit, beards, peyot, skirts, jewelry |
+| `js/community.js` | The twelve community designs and their spawn-menu entries |
 | `js/entities.js` | Ragdoll (muscles, AI hook, damage, status effects, dismemberment), crates, Road Roller, melon, knife, arrow |
 | `js/stands.js` | `Stand` class (movement, hitting, timers, generic AI) and the `MOVES` ability registry |
 | `js/standdefs.js` | The 26-Stand roster: names, stats, colors, art spec, J/K/L moves |
@@ -103,3 +112,7 @@ Heads, torsos, limbs and Stand bodies are rendered once into cached sprites
 4. If the user needs a new look, add a design to `DESIGNS` in `art.js`.
 
 The spawn menu, stat card, action pad and AI pick up the new Stand automatically.
+
+**Adding a community character:** add a design to `DESIGNS` in `js/community.js` (any key starting with
+`jc_`) and an entry to `COMMUNITY_LIST`. Options such as `cover`, `kippah`, `beard`, `peyot`, `tzitzit`,
+`cloak`, `skirt`, `shin`, `pendant`, `stripes` and `sash` are listed in JEWISH-COMMUNITY.md.
