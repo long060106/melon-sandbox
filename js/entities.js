@@ -173,6 +173,11 @@ class Ragdoll extends Body {
     this.menaceT = rand(0, 1);
     this.standKey = opts.stand || null;
     this.stand = null;
+    this.sat = opts.sat || null;          // Satire Mode character config (see js/satire.js)
+    this.immortal = !!(this.sat && this.sat.immortal);
+    this.satT = rand(1, 3);
+    this.satQuipT = 0;
+    this.satMelons = 0;
     if (this.standKey) {
       this.maxHp = this.hp = opts.hp || 150;
       this.jumpPower = 720;
@@ -314,6 +319,8 @@ class Ragdoll extends Body {
 
     this.tickStatus(dt);
     if (this.removed) return;
+    if (this.immortal && this.hp < this.maxHp) this.hp = Math.min(this.maxHp, this.hp + 45 * dt);
+    if (this.sat) this.satUpdate(dt);
 
     if (this.dead) { this.moveDir = 0; this.p.bFoot.plantX = this.p.fFoot.plantX = null; return; }
     if (this.stun > 0) this.stun -= dt;
@@ -419,6 +426,7 @@ class Ragdoll extends Body {
   // ------------------------------------------------------------ AI
   think(dt) {
     const st = this.stand;
+    if (this.sat) { this.satThink(dt); return; }
     if (!st || !JOJO.enabled || !JOJO.ai) { this.moveDir = 0; return; }
     if (this.aiDelay > 0) { this.aiDelay -= dt; this.moveDir = 0; return; }
     this.aiTimer -= dt;
@@ -457,14 +465,16 @@ class Ragdoll extends Body {
     if (this.frozen) { this.pendDmg += amount; this.pendHits++; return; }
     const at = part || this.p.chest;
     this.hp -= amount;
+    if (this.immortal && this.hp < 1) this.hp = 1;
     this.hpShow = 2.5;
+    if (this.sat) this.satHit(amount);
     if (!quiet) {
       this.hitFlash = 0.12;
       this.world.fx.blood(at.x, at.y, Math.ceil(amount * 0.5), vx, vy);
       if (amount >= 12 && !this.dead) this.stun = Math.max(this.stun, Math.min(2.2, amount / 20));
     }
     if (this.hp <= 0 && !this.dead && !this.has('doom')) this.die();
-    if (this.hp < -140 && !this.gibbed) this.gib();
+    if (this.hp < -140 && !this.gibbed && !this.immortal) this.gib();
   }
 
   /** Gold Experience Requiem: whoever just attacked is sent back to zero. */
@@ -517,7 +527,7 @@ class Ragdoll extends Body {
   }
 
   die() {
-    if (this.dead) return;
+    if (this.dead || this.immortal) return;
     this.dead = true;
     this.hp = Math.min(this.hp, 0);
     this.moveDir = 0;
@@ -526,7 +536,7 @@ class Ragdoll extends Body {
 
   /** clean = no blood (Sticky Fingers' zipper, The Hand's erasure). */
   breakJoint(group, clean = false) {
-    if (this.brokenGroups.has(group) || !DETACH[group]) return false;
+    if (this.immortal || this.brokenGroups.has(group) || !DETACH[group]) return false;
     let any = false;
     for (const c of this.constraints) if (c.joint === group && !c.broken) { c.broken = true; any = true; }
     if (!any) return false;
@@ -543,12 +553,14 @@ class Ragdoll extends Body {
 
   /** The Hand: the limb is scraped out of existence. */
   eraseLimb(group) {
+    if (this.immortal) return;
     this.breakJoint(group, true);
     this.erased.add(group);
     for (const n of DETACH[group]) this.p[n].ghost = true;
   }
 
   gib() {
+    if (this.immortal) return;
     this.gibbed = true;
     for (const g of Object.keys(DETACH)) this.breakJoint(g);
     for (const p of this.particles) p.addVel(rand(-500, 500), rand(-700, -100));
@@ -640,6 +652,11 @@ class Ragdoll extends Body {
       ctx.fillStyle = '#ffd84a'; ctx.strokeStyle = '#2a1238'; ctx.lineWidth = 2;
       ctx.beginPath(); ctx.moveTo(H.x - 7, top - 14 + bob); ctx.lineTo(H.x + 7, top - 14 + bob); ctx.lineTo(H.x, top - 4 + bob); ctx.closePath();
       ctx.fill(); ctx.stroke();
+    }
+    if (this.immortal) {
+      ctx.strokeStyle = '#ffd84a'; ctx.lineWidth = 3; ctx.shadowColor = '#ffd84a'; ctx.shadowBlur = 8;
+      ctx.beginPath(); ctx.ellipse(H.x, H.y - 25 + Math.sin(t * 3) * 1.5, 11, 3.5, 0, 0, TAU); ctx.stroke();
+      ctx.shadowBlur = 0;
     }
     if (!this.dead && (this.hpShow > 0 || this.controlled || (this.stand && this.hp < this.maxHp))) {
       const w = 36, x = H.x - w / 2, y = top;

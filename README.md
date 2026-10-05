@@ -58,6 +58,22 @@ On touch devices an on-screen action pad appears while you control someone.
 Hits landed in stopped time are stored and all land when time resumes. The **Stand Arrow**
 awakens a random Stand in a civilian, unless they're not worthy.
 
+## Satire Mode
+
+A second toggle in the top bar (it works alongside JoJo mode) adds a **Satire** group to the spawn menu: made-up politicians that poke fun at the political process itself. Everyone is fictional and party-neutral, and the jokes are about promises, committees, spin and red tape.
+
+| Character | Gag |
+|---|---|
+| Senator Flip-Flop | Changes sides when hit |
+| President Filibuster | Never stops talking |
+| Lobbyist | Coins fly out when hit |
+| Pundit | Hot takes at all times |
+| Bureaucrat | Slow, buried in red tape |
+| Campaign Candidate | Promises melons (and drops them) |
+| The Unkillable | Cannot die: no damage, limb loss, erasure, doom or gibbing gets through. Explicit Delete and Clear still remove it. |
+
+Characters live in `js/satire.js` (`SATIRE_LIST`): add an entry and a design to add one. The Unkillable's `name` field is all you need to change to rename it.
+
 ## Art
 Everything is drawn in code: an anime look with ink outlines and cel shading. Designs are
 original interpretations built from each character's colors and silhouette, not traces.
@@ -74,6 +90,7 @@ Heads, torsos, limbs and Stand bodies are rendered once into cached sprites
 | `js/standdefs.js` | The 26-Stand roster: names, stats, colors, art spec, J/K/L moves |
 | `js/standart.js` | Stand figures, heads, patterns, auras, and the plane / pistols / vines Stands |
 | `js/projectiles.js` | Projectiles, zones (virus cloud, emerald barrier, life tree, sound word), summons |
+| `js/satire.js` | Satire Mode: fictional politician characters, their quips and quirks, the unkillable character |
 | `js/jojo.js` | JoJo settings + presentation: backgrounds, time effects, stat card, To Be Continued |
 | `js/effects.js` | Blood, fire, fog, cries, rings, sparks, ゴゴゴ |
 | `js/audio.js` | Synthesized SFX + optional text-to-speech |
