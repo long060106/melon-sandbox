@@ -48,6 +48,13 @@ for (const d of STAND_LIST) {
   };
 }
 
+for (const d of SATIRE_LIST) {
+  SPAWN[d.id] = {
+    cat: 'Satire', satire: true, label: d.name, sub: d.sub, color: d.color,
+    make: (x, y) => new Ragdoll(world, x, groundSafe(y), { sat: d, design: d.id, name: d.name, hp: d.hp, facing: faceCenter(x) }),
+  };
+}
+
 function buildCatalog() {
   const el = document.getElementById('catalog');
   const cats = {};
@@ -56,6 +63,7 @@ function buildCatalog() {
   for (const [cat, items] of Object.entries(cats)) {
     const wrap = document.createElement('div');
     if (items[0][1].jojo) wrap.className = 'cat-jojo';
+    else if (items[0][1].satire) wrap.className = 'cat-satire';
     wrap.innerHTML = `<h4>${cat}</h4>`;
     for (const [key, s] of items) {
       const b = document.createElement('button');
@@ -351,6 +359,14 @@ for (const input of document.querySelectorAll('[data-opt]')) {
   });
 }
 
+document.getElementById('satireToggle').onclick = () => setSatire(!SATIRE.enabled);
+function setSatire(on) {
+  SATIRE.enabled = on;
+  document.body.classList.toggle('satire', on);
+  document.querySelector('#satireToggle b').textContent = on ? 'ON' : 'OFF';
+  if (!on && state.spawn && SPAWN[state.spawn].satire) selectSpawn(null);
+  if (on) fx.text(0, -20, 'SATIRE MODE', { screen: true, size: 72, color: '#ffd84a', stroke: '#1a2a5a', life: 1.4, vx: 0, vy: 0, rot: 0.04 });
+}
 document.getElementById('jojoToggle').onclick = () => setJojo(!JOJO.enabled);
 function setJojo(on) {
   JOJO.enabled = on;
