@@ -37,6 +37,27 @@ const SPAWN = {
   knife:  { cat: 'Objects', label: 'Knife', sub: 'Throw it', color: '#c9ccd4',
             make: (x, y) => new Stick(world, x, y, 0, 'knife') },
 };
+// The Jewish community: twelve ordinary people (no Stands), plus a button that gathers them all.
+for (const c of COMMUNITY_LIST) {
+  SPAWN[c.id] = {
+    cat: 'Jewish Community', label: `${c.name} · ${c.he}`, sub: c.sub, color: c.color,
+    make: (x, y) => new Ragdoll(world, x, groundSafe(y), { design: c.id, name: c.name, facing: faceCenter(x) }),
+  };
+}
+SPAWN.community = {
+  cat: 'Jewish Community', label: 'Gather the community', sub: 'All twelve, side by side', color: '#2f78c8',
+  make: (x, y) => {
+    const gap = Math.min(56, (world.width - 120) / (COMMUNITY_LIST.length - 1));
+    const x0 = clamp(x - gap * (COMMUNITY_LIST.length - 1) / 2, 60, world.width - 60 - gap * (COMMUNITY_LIST.length - 1));
+    let last = null;
+    COMMUNITY_LIST.forEach((c, i) => {
+      if (last) world.add(last);
+      last = new Ragdoll(world, x0 + i * gap, groundSafe(y), { design: c.id, name: c.name, facing: faceCenter(x0 + i * gap) });
+    });
+    return last;   // spawnAt() adds the final one
+  },
+};
+
 SPAWN.arrow = { cat: 'JoJo Items', jojo: true, label: 'Stand Arrow', sub: 'Stab a civilian', color: '#e8c04a',
                 make: (x, y) => new Stick(world, x, y, -0.3, 'arrow') };
 SPAWN.roller = { cat: 'JoJo Items', jojo: true, label: 'Road Roller', sub: 'ロードローラーだ!', color: '#f2c230',

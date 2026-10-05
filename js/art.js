@@ -503,6 +503,7 @@ function drawAnimeHead(ctx, r) {
 function renderHead(ctx, d, expr) {
   const hs = HAIR[d.style] || HAIR.short;
   if (hs.back) hs.back(ctx, d, 0);
+  if (d.cover) coverBack(ctx, d);
   celBlob(ctx, d.fem ? HEAD_F : HEAD_M, d.skin, true, 1.8);
   // Ear.
   ctx.beginPath(); ctx.ellipse(-1.5, 1, 2.4, 3.4, 0, 0, Math.PI * 2);
@@ -511,7 +512,10 @@ function renderHead(ctx, d, expr) {
   if (d.acc && d.acc.includes('cherry')) { dotInk(ctx, -2.5, 6.5, 1.5, '#d8283a', 0.8); dotInk(ctx, -0.5, 7.5, 1.5, '#d8283a', 0.8); }
   if (d.acc && d.acc.includes('penEarring')) { ctx.strokeStyle = INK; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.moveTo(-1.5, 4); ctx.lineTo(-2, 10); ctx.stroke(); }
   drawFace(ctx, d, expr, false);
+  if (d.beard) drawBeard(ctx, d);
+  if (d.peyot) drawPeyot(ctx, d);
   hs.front(ctx, d, 0);
+  if (d.cover) drawCover(ctx, d);
 }
 
 function drawBookFace(c, t) {
@@ -535,6 +539,7 @@ function drawCharacter(ctx, r) {
   ctx.lineJoin = 'round'; ctx.lineCap = 'round';
   const sleeve = d.coat || d.top;
   const sleeveB = shade(sleeve, -0.14), pantsB = shade(d.bottom, -0.14);
+  const shin = d.shin || d.bottom, shinB = shade(shin, -0.14);
 
   // Spine frame.
   const n = P.neck, c = P.chest, pl = P.pelvis;
@@ -549,7 +554,7 @@ function drawCharacter(ctx, r) {
   if (!er('bLeg')) {
     if (!br('bLeg')) limb(ctx, pl, P.bKnee, 6.4, 5.4, pantsB, f);
     else limb(ctx, P.bKnee, { x: P.bKnee.x - (P.bFoot.x - P.bKnee.x) * 0.5, y: P.bKnee.y - (P.bFoot.y - P.bKnee.y) * 0.5 }, 5.4, 6, pantsB, f);
-    limb(ctx, P.bKnee, P.bFoot, 5.4, 4.4, pantsB, f);
+    limb(ctx, P.bKnee, P.bFoot, 5.4, 4.4, shinB, f);
     drawShoe(ctx, P.bFoot, f, shade(d.shoes, -0.12));
     if (d.acc.includes('heartKnees')) drawKneeHeart(ctx, P.bKnee, d);
   }
@@ -570,11 +575,14 @@ function drawCharacter(ctx, r) {
   if (!er('fLeg')) {
     if (!br('fLeg')) limb(ctx, pl, P.fKnee, 6.6, 5.6, d.bottom, f);
     else limb(ctx, P.fKnee, { x: P.fKnee.x - (P.fFoot.x - P.fKnee.x) * 0.5, y: P.fKnee.y - (P.fFoot.y - P.fKnee.y) * 0.5 }, 5.6, 6.2, d.bottom, f);
-    limb(ctx, P.fKnee, P.fFoot, 5.6, 4.6, d.bottom, f);
+    limb(ctx, P.fKnee, P.fFoot, 5.6, 4.6, shin, f);
     drawShoe(ctx, P.fFoot, f, d.shoes);
     if (d.acc.includes('heartKnees')) drawKneeHeart(ctx, P.fKnee, d);
   }
+  if (d.skirt) drawSkirt(ctx, r, L);
   if (d.coatLong) drawCoatTail(ctx, r, L, 'front');
+  if (d.cloak) drawCloak(ctx, r, n, c, pl, U, L, M);
+  if (d.tzitzit) { const q = _Q(pl, 7.5, 0, L, L); drawFringe(ctx, r, q[0], q[1]); }
 
   // Neck + head.
   if (!er('head')) {
@@ -743,6 +751,7 @@ function drawTorsoPattern(ctx, r, n, c, pl, U, L, M, P) {
       const q = P(c, fk, dk); ctx.beginPath(); ctx.ellipse(q[0], q[1], 2, 1.4, 0, 0, Math.PI * 2); ctx.fill();
     }
   }
+  drawCommunityPattern(ctx, r, n, c, pl, U, L, M, P);
 }
 
 function drawTorsoAccessories(ctx, r, n, c, pl, U, L, M, P) {
@@ -804,6 +813,7 @@ function drawTorsoAccessories(ctx, r, n, c, pl, U, L, M, P) {
     const q = P(n, -5, 3, U, U);
     ctx.fillStyle = '#6a3a2a'; starPath(ctx, q[0], q[1], 2.2); ctx.fill();
   }
+  drawCommunityAccessories(ctx, r, n, c, pl, U, L, M, P);
 }
 
 function drawCoatTail(ctx, r, L, side) {
